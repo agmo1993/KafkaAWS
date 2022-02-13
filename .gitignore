@@ -1,3 +1,9 @@
+# Config secrets
+configuration/configuration.sh
+configuration/hosts
+configuration/zookeeper.properties
+configuration/server.properties
+
 # Logs
 logs
 *.log
