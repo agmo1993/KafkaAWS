@@ -3,6 +3,9 @@ configuration/configuration.sh
 configuration/hosts
 configuration/zookeeper.properties
 configuration/server.properties
+configuration/broker_ips.sh
+configuration/vpc_configs.sh
+*.pem
 
 # Logs
 logs

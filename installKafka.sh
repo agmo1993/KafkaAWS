@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configure the Kafka brokers, install openjdk and confluence community
-export BROKER_IPS=(10.0.2.11 10.0.2.12 10.0.2.13)
+. ./configuration/broker_ips.sh
 echo "${BROKER_IPS[*]}"
 
 INDEX=1
