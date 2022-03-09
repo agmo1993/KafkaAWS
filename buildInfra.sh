@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#
+# Builds infrastructure for kafka brokers
+# Usage: <Required number of brokers>
+#
+
 COUNTER=1
 BROKER_IPS=()
 
@@ -7,6 +12,33 @@ BROKER_IPS=()
 . ./configuration/vpc_configs.sh
 . ./configuration/configuration.sh
 
+# Create NAT gateway 
+NAT_ID=$(aws ec2 create-nat-gateway \
+ --subnet-id $SN_PUBLIC \
+ --allocation-id $E_IP | jq -r .NatGateway.NatGatewayId)
+
+echo "export NAT_ID=${NAT_ID}" >> configuration/vpc_configs.sh
+
+# Get default route table id
+ROUTE_TABLE_DEFAULT=$(aws ec2 describe-route-tables \
+ --filters "Name=association.main,Values=true" "Name=vpc-id,Values=${VPC_ID}" \
+ --query=RouteTables[*].RouteTableId \
+ --output=text )
+
+# Get Bastion instance Public IP
+JUMP_BOX_IP=$(aws ec2 describe-instances\
+ --filters "Name=instance-state-name,Values=running" "Name=instance-id,Values=${JUMP_BOX_ID}"\
+ --query 'Reservations[*].Instances[*].[PublicIpAddress]'\
+ --output text)
+
+echo "export NAT_ID=${JUMP_BOX_IP}" >> configuration/vpc_configs.sh
+
+# Associate NAT gateway with default route table
+aws ec2 create-route \
+ --route-table-id  $ROUTE_TABLE_DEFAULT \
+ --destination-cidr-block 0.0.0.0/0 \
+ --nat-gateway-id $NAT_ID
+ 
 cp ./configuration/hostsSample configuration/hosts
 cp ./configuration/zookeeperSample.properties configuration/zookeeper.properties
 

@@ -39,3 +39,20 @@ export JUMP_BOX_ID=i-0e52487e72d78a143
 export KEY_LOCATION=configuration/kafka-cluster.pem
 export SG_SSH=sg-05fa9da133106d93c
 ```
+
+## Set up infrastructure (instances) in private subnet
+
+Build the infrastructure with the following command, specifiying the number
+of instances/brokers required in the kafka cluster as the first argument,
+
+```sh
+./buildInfra.sh 3
+```
+
+## Install Kafka
+
+Install Kafka and zookeeper across all instances,
+
+```sh
+./installKafka.sh
+```

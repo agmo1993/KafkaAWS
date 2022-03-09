@@ -45,10 +45,10 @@ aws iam create-role --path / \
 --role-name EC2Admin \
 --assume-role-policy-document file://admin.json
 
-aws iam create-instance-profile --instance-profile-name ec2-jump-box
+aws iam create-instance-profile --instance-profile-name ec2-bastion
 
 aws iam add-role-to-instance-profile \
-    --instance-profile-name ec2-jump-box \
+    --instance-profile-name ec2-bastion \
     --role-name EC2Admin
 
 # Create key pair with chosen Key name
@@ -70,23 +70,6 @@ JUMP_BOX_ID=$(aws ec2 run-instances \
 ## Add nat gateway to public subnet
 # Create elastic IP
 E_IP=$(aws ec2 allocate-address | jq -r .AllocationId)
-
-# Create NAT gateway 
-NAT_ID=$(aws ec2 create-nat-gateway \
- --subnet-id $SN_PUBLIC \
- --allocation-id $E_IP | jq -r .NatGateway.NatGatewayId)
-
-# Get default route table id
-ROUTE_TABLE_DEFAULT=$(aws ec2 describe-route-tables \
- --filters "Name=association.main,Values=true" "Name=vpc-id,Values=${VPC_ID}" \
- --query=RouteTables[*].RouteTableId \
- --output=text )
-
-# Associate NAT gateway with default route table
-aws ec2 create-route \
- --route-table-id  $ROUTE_TABLE_DEFAULT \
- --destination-cidr-block 0.0.0.0/0 \
- --nat-gateway-id $NAT_ID
 
 echo "VPC, private and public subnet created"
  
